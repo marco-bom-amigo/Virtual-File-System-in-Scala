@@ -1,6 +1,6 @@
 package com.rtjvm.scala.oop.commands
 
-import com.rtjvm.scala.oop.files.Directory
+import com.rtjvm.scala.oop.files.{DirEntry, Directory}
 import com.rtjvm.scala.oop.filesystem.State
 
 class Mkdir(name: String) extends Command {
@@ -24,7 +24,19 @@ class Mkdir(name: String) extends Command {
   }
 
   def doMkdir(state: State, name: String): State = {
-
+    def updateStructure(currentDirectory: Directory, path: List[String], newEntry: DirEntry): Directory = {
+      if(path.isEmpty) currentDirectory.addEntry(newEntry)
+      else {
+        val oldEntry = currentDirectory.findEntry(path.head).asDirectory
+        currentDirectory.replaceEntry(oldEntry.name, updateStructure(oldEntry, path.tail, newEntry))
+      }
+    }
+    val wd = state.wd
+    val allDirsInPath = wd.getAllFoldersInPath
+    val newDir = Directory.empty(wd.path, name)
+    val newRoot = updateStructure(state.root, allDirsInPath, newDir)
+    val newWD = newRoot.findDescendant(allDirsInPath)
+    State(newRoot, newWD)
   }
 
 }
