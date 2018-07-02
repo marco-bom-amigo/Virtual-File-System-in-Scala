@@ -1,4 +1,5 @@
 package com.rtjvm.scala.oop.commands
+
 import com.rtjvm.scala.oop.files.{DirEntry, Directory}
 import com.rtjvm.scala.oop.filesystem.State
 
@@ -10,9 +11,10 @@ class Cd(dir: String) extends Command {
 
     val root = state.root
     val wd = state.wd
+
     val absolutePath =
       if (dir.startsWith(Directory.SEPARATOR)) dir
-      else if (wd.isRoot) wd.path + dir
+      else if(wd.isRoot) wd.path + dir
       else wd.path + Directory.SEPARATOR + dir
 
     val destinationDirectory = doFindEntry(root, absolutePath)
@@ -21,11 +23,9 @@ class Cd(dir: String) extends Command {
       state.setMessage(dir + ": no such directory")
     else
       State(root, destinationDirectory.asDirectory)
-
   }
 
   def doFindEntry(root: Directory, path: String): DirEntry = {
-
     @tailrec
     def findEntryHelper(currentDirectory: Directory, path: List[String]): DirEntry =
       if (path.isEmpty || path.head.isEmpty) currentDirectory
@@ -39,8 +39,8 @@ class Cd(dir: String) extends Command {
     @tailrec
     def collapseRelativeTokens(path: List[String], result: List[String]): List[String] = {
       if (path.isEmpty) result
-      else if (".".equals(path.head)) collapseRelativeTokens(path.tail, result)
-      else if ("..".equals(path.head)) {
+      else if(".".equals(path.head)) collapseRelativeTokens(path.tail, result)
+      else if("..".equals(path.head)) {
         if (result.isEmpty) null
         else collapseRelativeTokens(path.tail, result.init)
       } else collapseRelativeTokens(path.tail, result :+ path.head)
