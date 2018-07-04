@@ -13,4 +13,5 @@ class Cat(filename: String) extends Command {
     else
       state.setMessage(dirEntry.asFile.contents)
   }
+
 }
